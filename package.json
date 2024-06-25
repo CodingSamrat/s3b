@@ -1,0 +1,30 @@
+{
+  "name": "s3b",
+  "version": "0.0.1",
+  "description": "S3 Bucket",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "s3b": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodingSamrat/s3b.git"
+  },
+  "keywords": [
+    "s3",
+    "bucket"
+  ],
+  "author": "Sam (Coding Samrat)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CodingSamrat/s3b/issues"
+  },
+  "homepage": "https://github.com/CodingSamrat/s3b#readme",
+  "dependencies": {
+    "yargs": "^17.7.2"
+  }
+}
