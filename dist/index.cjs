@@ -52,10 +52,8 @@ function getApiManager({ bucketId, apiKey, apiSecret, baseURL }) {
 // src/bucket.ts
 var import_form_data = __toESM(require("form-data"), 1);
 var Bucket = class {
-  bucketId;
   ApiManager;
   constructor(data) {
-    this.bucketId = data.bucketId;
     this.ApiManager = getApiManager({
       bucketId: data.bucketId,
       apiKey: data.apiKey,
@@ -63,6 +61,13 @@ var Bucket = class {
       baseURL: data.baseURL
     });
   }
+  // =================================================================================
+  // Name         : uploadFile
+  // Description  : Upload file to S3 Bucket
+  // Author       : Sam (Coding Samrat)
+  // Params       : dir: string, file: File
+  // Return       : downloadUrl: string | null
+  // =================================================================================
   async uploadFile(dir, file) {
     try {
       const formData = new import_form_data.default();
@@ -76,6 +81,13 @@ var Bucket = class {
       return null;
     }
   }
+  // =================================================================================
+  // Name         : uploadMultipleFile
+  // Description  : <{This feature is currently unavailable}>
+  // Author       : Sam (Coding Samrat)
+  // Params       : dir: string, files: File[]
+  // Return       : [downloadUrl:string] | null
+  // =================================================================================
   async #uploadMultipleFile(dir, files) {
     try {
       const formData = new import_form_data.default();
@@ -94,15 +106,33 @@ var Bucket = class {
       return null;
     }
   }
+  // =================================================================================
+  // Name         : deleteFile
+  // Description  : Delete file from S3 Bucket
+  // Author       : Sam (Coding Samrat)
+  // Params       : downloadUrl: string
+  // Return       : boolean
+  // =================================================================================
   async deleteFile(downloadUrl) {
     try {
       const { data } = await this.ApiManager.post("/client/file/delete", { downloadUrl });
-      return true;
+      if (data.success) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       console.error("Error:", error?.response?.data?.error);
       return false;
     }
   }
+  // =================================================================================
+  // Name         : isExist
+  // Description  : Check if file exist of not
+  // Author       : Sam (Coding Samrat)
+  // Params       : downloadUrl: string
+  // Return       : boolean
+  // =================================================================================
   async isExist(downloadUrl) {
     try {
       const { data } = await this.ApiManager.post("/client/file/is-exist", { downloadUrl });
@@ -116,6 +146,13 @@ var Bucket = class {
       return false;
     }
   }
+  // =================================================================================
+  // Name         : copy
+  // Description  : Copy file from source to destination
+  // Author       : Sam (Coding Samrat)
+  // Params       : source: String, destination: String
+  // Return       : boolean
+  // =================================================================================
   async copy(source, destination) {
     try {
       const { data } = await this.ApiManager.post("/client/file/copy", { source, destination });
@@ -130,6 +167,13 @@ var Bucket = class {
       return false;
     }
   }
+  // =================================================================================
+  // Name         : move
+  // Description  : Move file from source to destination
+  // Author       : Sam (Coding Samrat)
+  // Params       : source: String, destination: String
+  // Return       : boolean
+  // =================================================================================
   async move(source, destination) {
     try {
       const { data } = await this.ApiManager.post("/client/file/move", { source, destination });
@@ -144,6 +188,13 @@ var Bucket = class {
       return false;
     }
   }
+  // =================================================================================
+  // Name         : readDir
+  // Description  : Lists all dir & files, with flag of `isFile`
+  // Author       : Sam (Coding Samrat)
+  // Params       : dir: string
+  // Return       : [Object] | null
+  // =================================================================================
   async readDir(dir) {
     try {
       const { data } = await this.ApiManager.post("/client/file/read-dir", { dir });

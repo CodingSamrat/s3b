@@ -6,7 +6,6 @@ interface BucketData {
 }
 declare class Bucket {
     #private;
-    private bucketId;
     private ApiManager;
     constructor(data: BucketData);
     uploadFile(dir: string, file: File): Promise<string | null>;

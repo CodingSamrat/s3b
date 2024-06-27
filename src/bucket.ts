@@ -12,12 +12,10 @@ interface BucketData {
 }
 
 export class Bucket {
-    private bucketId: string;
     private ApiManager: AxiosInstance;
 
     constructor(data: BucketData) {
-        this.bucketId = data.bucketId;
-
+        // Create instance of ApiManager
         this.ApiManager = getApiManager({
             bucketId: data.bucketId,
             apiKey: data.apiKey,
@@ -26,21 +24,46 @@ export class Bucket {
         });
     }
 
+
+
+    // =================================================================================
+    // Name         : uploadFile
+    // Description  : Upload file to S3 Bucket
+    // Author       : Sam (Coding Samrat)
+    // Params       : dir: string, file: File
+    // Return       : downloadUrl: string | null
+    // =================================================================================
     async uploadFile(dir: string, file: File): Promise<string | null> {
         try {
+            // Create instance of FormData
             const formData = new FormData();
+
+            // Append `dir` & ` `file` to the dormData
             formData.append('dir', dir);
             formData.append('file', file);
+
+            // API call by axios
             const { data } = await this.ApiManager.post('/client/file/upload', formData);
 
+            // return `downloadURL`
             return data.downloadURL;
-        } catch (error: any) {
+        }
+        catch (error: any) {
             console.log(error)
             console.error('Error:', error?.response?.data?.error);
             return null;
         }
     }
 
+
+
+    // =================================================================================
+    // Name         : uploadMultipleFile
+    // Description  : <{This feature is currently unavailable}>
+    // Author       : Sam (Coding Samrat)
+    // Params       : dir: string, files: File[]
+    // Return       : [downloadUrl:string] | null
+    // =================================================================================
     async #uploadMultipleFile(dir: string, files: File[]): Promise<string | null> {
         try {
             const formData: FormData = new FormData();
@@ -52,8 +75,6 @@ export class Bucket {
                 const file = files[i];
                 formData.append('file', file);
             }
-
-
 
             console.log('FormData:', formData)
             const { data } = await this.ApiManager.post('/client/file/upload-many', formData);
@@ -68,11 +89,24 @@ export class Bucket {
 
 
 
+    // =================================================================================
+    // Name         : deleteFile
+    // Description  : Delete file from S3 Bucket
+    // Author       : Sam (Coding Samrat)
+    // Params       : downloadUrl: string
+    // Return       : boolean
+    // =================================================================================
     async deleteFile(downloadUrl: string): Promise<boolean> {
         try {
+            // API call by axios
             const { data } = await this.ApiManager.post('/client/file/delete', { downloadUrl });
 
-            return true;
+            // Check if file deleted or not
+            if (data.success) {
+                return true;
+            } else {
+                return false
+            }
         } catch (error: any) {
             console.error('Error:', error?.response?.data?.error);
             return false;
@@ -81,10 +115,19 @@ export class Bucket {
 
 
 
+    // =================================================================================
+    // Name         : isExist
+    // Description  : Check if file exist of not
+    // Author       : Sam (Coding Samrat)
+    // Params       : downloadUrl: string
+    // Return       : boolean
+    // =================================================================================
     async isExist(downloadUrl: String): Promise<boolean> {
         try {
+            // API call by axios
             const { data } = await this.ApiManager.post('/client/file/is-exist', { downloadUrl });
 
+            // Check if file exists or not
             if (data.isExist) {
                 return true;
             } else {
@@ -97,11 +140,21 @@ export class Bucket {
     }
 
 
+
+    // =================================================================================
+    // Name         : copy
+    // Description  : Copy file from source to destination
+    // Author       : Sam (Coding Samrat)
+    // Params       : source: String, destination: String
+    // Return       : boolean
+    // =================================================================================
     async copy(source: String, destination: String): Promise<boolean> {
         try {
+            // API call by axios
             const { data } = await this.ApiManager.post('/client/file/copy', { source, destination });
             console.log(data)
 
+            // Check if file copied or not
             if (data.success) {
                 return true;
             } else {
@@ -114,11 +167,21 @@ export class Bucket {
     }
 
 
+
+    // =================================================================================
+    // Name         : move
+    // Description  : Move file from source to destination
+    // Author       : Sam (Coding Samrat)
+    // Params       : source: String, destination: String
+    // Return       : boolean
+    // =================================================================================
     async move(source: String, destination: String): Promise<boolean> {
         try {
+            // API call by axios
             const { data } = await this.ApiManager.post('/client/file/move', { source, destination });
             console.log(data)
 
+            // Check if file moved or not
             if (data.success) {
                 return true;
             } else {
@@ -132,10 +195,19 @@ export class Bucket {
 
 
 
+    // =================================================================================
+    // Name         : readDir
+    // Description  : Lists all dir & files, with flag of `isFile`
+    // Author       : Sam (Coding Samrat)
+    // Params       : dir: string
+    // Return       : [Object] | null
+    // =================================================================================
     async readDir(dir: String): Promise<Object[] | null> {
         try {
+            // API call by axios
             const { data } = await this.ApiManager.post('/client/file/read-dir', { dir });
 
+            // return dirData. list of dir & files
             return data.dirData
         } catch (error: any) {
             console.error('Error:', error?.response?.data?.error);
