@@ -1,22 +1,23 @@
 {
   "name": "s3b",
-  "version": "0.0.1",
-  "description": "S3 Bucket",
+  "version": "1.0.0",
+  "description": "A Self Hosted S3 Bucket",
   "main": "index.js",
   "type": "module",
-  "bin": {
-    "s3b": "index.js"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": ""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CodingSamrat/s3b.git"
   },
   "keywords": [
-    "s3",
-    "bucket"
+    "typescript",
+    "npm",
+    "package",
+    "s3b",
+    "s3bucket",
+    "storage"
   ],
   "author": "Sam (Coding Samrat)",
   "license": "MIT",
@@ -24,7 +25,12 @@
     "url": "https://github.com/CodingSamrat/s3b/issues"
   },
   "homepage": "https://github.com/CodingSamrat/s3b#readme",
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.2"
+  },
   "dependencies": {
-    "yargs": "^17.7.2"
+    "axios": "^1.7.2",
+    "form-data": "^4.0.0"
   }
 }

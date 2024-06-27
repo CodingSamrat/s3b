@@ -91,3 +91,4 @@ npm-debug.log*
 .vercel
 Assets/DigitalOcean.txt
 Assets/server_doc.md
+s3b.test.js
