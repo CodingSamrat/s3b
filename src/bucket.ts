@@ -98,17 +98,23 @@ export class Bucket {
     // =================================================================================
     async deleteFile(downloadUrl: string): Promise<boolean> {
         try {
-            // API call by axios
+
             const { data } = await this.ApiManager.post('/client/file/delete', { downloadUrl });
 
             // Check if file deleted or not
-            if (data.success) {
+            if (data?.success) {
                 return true;
             } else {
                 return false
             }
-        } catch (error: any) {
-            console.error('Error:', error?.response?.data?.error);
+        }
+        catch (error: any) {
+
+            if (error.response.data.error === 'File dose not exist!') {
+                throw new Error('File dose not exist!')
+            }
+            console.log(error)
+            // console.error('Error:', error?.response?.data?.error);
             return false;
         }
     }

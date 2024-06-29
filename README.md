@@ -62,14 +62,14 @@ bucket.isExist(downloadUrl)
 bucket.readDir(dir)
 
 // Copy file
-// Params  : source, destination
+// Params  : source, destination 
 // Returns : boolean
-bucket.Copy(dir)
+bucket.Copy(source, destination) // relative path from bucket
 
 // Move file
 // Params  : source, destination
 // Returns : boolean
-bucket.Move(dir)
+bucket.Move(source, destination) // relative path from bucket
 ```
 
 

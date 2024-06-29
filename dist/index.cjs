@@ -116,13 +116,16 @@ var Bucket = class {
   async deleteFile(downloadUrl) {
     try {
       const { data } = await this.ApiManager.post("/client/file/delete", { downloadUrl });
-      if (data.success) {
+      if (data?.success) {
         return true;
       } else {
         return false;
       }
     } catch (error) {
-      console.error("Error:", error?.response?.data?.error);
+      if (error.response.data.error === "File dose not exist!") {
+        throw new Error("File dose not exist!");
+      }
+      console.log(error);
       return false;
     }
   }
