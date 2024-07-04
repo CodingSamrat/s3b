@@ -8,7 +8,7 @@ declare class Bucket {
     #private;
     private ApiManager;
     constructor(data: BucketData);
-    uploadFile(dir: string, file: File): Promise<string | null>;
+    uploadFile(filePath: string, file: File): Promise<string | null>;
     deleteFile(downloadUrl: string): Promise<boolean>;
     isExist(downloadUrl: String): Promise<boolean>;
     copy(source: String, destination: String): Promise<boolean>;

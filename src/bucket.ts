@@ -30,16 +30,16 @@ export class Bucket {
     // Name         : uploadFile
     // Description  : Upload file to S3 Bucket
     // Author       : Sam (Coding Samrat)
-    // Params       : dir: string, file: File
+    // Params       : dir: string - file full path, file: File
     // Return       : downloadUrl: string | null
     // =================================================================================
-    async uploadFile(dir: string, file: File): Promise<string | null> {
+    async uploadFile(filePath: string, file: File): Promise<string | null> {
         try {
             // Create instance of FormData
             const formData = new FormData();
 
             // Append `dir` & ` `file` to the dormData
-            formData.append('dir', dir);
+            formData.append('dir', filePath);
             formData.append('file', file);
 
             // API call by axios

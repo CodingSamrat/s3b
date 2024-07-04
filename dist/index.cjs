@@ -65,13 +65,13 @@ var Bucket = class {
   // Name         : uploadFile
   // Description  : Upload file to S3 Bucket
   // Author       : Sam (Coding Samrat)
-  // Params       : dir: string, file: File
+  // Params       : dir: string - file full path, file: File
   // Return       : downloadUrl: string | null
   // =================================================================================
-  async uploadFile(dir, file) {
+  async uploadFile(filePath, file) {
     try {
       const formData = new import_form_data.default();
-      formData.append("dir", dir);
+      formData.append("dir", filePath);
       formData.append("file", file);
       const { data } = await this.ApiManager.post("/client/file/upload", formData);
       return data.downloadURL;
