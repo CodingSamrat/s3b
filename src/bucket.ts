@@ -39,7 +39,7 @@ export class Bucket {
             const formData = new FormData();
 
             // Append `dir` & ` `file` to the dormData
-            formData.append('dir', filePath);
+            formData.append('filePath', filePath);
             formData.append('file', file);
 
             // API call by axios

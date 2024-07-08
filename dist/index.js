@@ -35,7 +35,7 @@ var Bucket = class {
   async uploadFile(filePath, file) {
     try {
       const formData = new FormData();
-      formData.append("dir", filePath);
+      formData.append("filePath", filePath);
       formData.append("file", file);
       const { data } = await this.ApiManager.post("/client/file/upload", formData);
       return data.downloadURL;
