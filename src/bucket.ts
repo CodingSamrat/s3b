@@ -26,31 +26,33 @@ export class Bucket {
 
 
 
-    // =================================================================================
-    // Name         : uploadFile
-    // Description  : Upload file to S3 Bucket
-    // Author       : Sam (Coding Samrat)
-    // Params       : dir: string - file full path, file: File
-    // Return       : downloadUrl: string | null
-    // =================================================================================
-    async uploadFile(filePath: string, file: File): Promise<string | null> {
+    /**
+     * Upload file to cloud storage
+     * @param filePath Full path of file
+     * @param readStream  File ReadSteam. use `fs.createReadStream(file.path)`
+     * @returns downloadUrl or null 
+     */
+    async uploadFile(filePath: string, readStream: File): Promise<string | null> {
+
         try {
             // Create instance of FormData
             const formData = new FormData();
 
             // Append `dir` & ` `file` to the dormData
             formData.append('filePath', filePath);
-            formData.append('file', file);
+            formData.append('file', readStream);
+
 
             // API call by axios
             const { data } = await this.ApiManager.post('/client/file/upload', formData);
+            console.log(data)
 
             // return `downloadURL`
-            return data.downloadURL;
+            return data?.downloadURL;
         }
         catch (error: any) {
-            console.log(error)
-            console.error('Error:', error?.response?.data?.error);
+            console.log(error?.message)
+            // console.error('Error:', error?.response?.data?.error);
             return null;
         }
     }
@@ -78,10 +80,10 @@ export class Bucket {
 
             console.log('FormData:', formData)
             const { data } = await this.ApiManager.post('/client/file/upload-many', formData);
-            console.log(data)
+            // console.log(data)
             return data.downloadURL;
         } catch (error: any) {
-            console.log(error)
+            // console.log(error)
             console.error('Error:', error?.response?.data?.error);
             return null;
         }
@@ -89,13 +91,12 @@ export class Bucket {
 
 
 
-    // =================================================================================
-    // Name         : deleteFile
-    // Description  : Delete file from S3 Bucket
-    // Author       : Sam (Coding Samrat)
-    // Params       : downloadUrl: string
-    // Return       : boolean
-    // =================================================================================
+
+    /**
+     * Delete file from S3 Bucket
+     * @param downloadUrl Download URL of file
+     * @returns boolean
+     */
     async deleteFile(downloadUrl: string): Promise<boolean> {
         try {
 
@@ -121,13 +122,12 @@ export class Bucket {
 
 
 
-    // =================================================================================
-    // Name         : isExist
-    // Description  : Check if file exist of not
-    // Author       : Sam (Coding Samrat)
-    // Params       : downloadUrl: string
-    // Return       : boolean
-    // =================================================================================
+
+    /**
+     * Check if a file exist or not on cloud storage.
+     * @param downloadUrl Download URL of file
+     * @returns boolean
+     */
     async isExist(downloadUrl: String): Promise<boolean> {
         try {
             // API call by axios
@@ -147,13 +147,13 @@ export class Bucket {
 
 
 
-    // =================================================================================
-    // Name         : copy
-    // Description  : Copy file from source to destination
-    // Author       : Sam (Coding Samrat)
-    // Params       : source: String, destination: String
-    // Return       : boolean
-    // =================================================================================
+
+    /**
+     * Copy file from source to destination
+     * @param source Current file path
+     * @param destination Destination path 
+     * @returns boolean
+     */
     async copy(source: String, destination: String): Promise<boolean> {
         try {
             // API call by axios
@@ -174,13 +174,12 @@ export class Bucket {
 
 
 
-    // =================================================================================
-    // Name         : move
-    // Description  : Move file from source to destination
-    // Author       : Sam (Coding Samrat)
-    // Params       : source: String, destination: String
-    // Return       : boolean
-    // =================================================================================
+    /**
+     * Move file from source to destination
+     * @param source Current file path
+     * @param destination Destination path 
+     * @returns boolean
+     */
     async move(source: String, destination: String): Promise<boolean> {
         try {
             // API call by axios
@@ -201,13 +200,12 @@ export class Bucket {
 
 
 
-    // =================================================================================
-    // Name         : readDir
-    // Description  : Lists all dir & files, with flag of `isFile`
-    // Author       : Sam (Coding Samrat)
-    // Params       : dir: string
-    // Return       : [Object] | null
-    // =================================================================================
+
+    /**
+     * Lists all dir & files, with flag of `isFile`
+     * @param dir Target directory path
+     * @returns Object of directory data or null
+     */
     async readDir(dir: String): Promise<Object[] | null> {
         try {
             // API call by axios
@@ -218,6 +216,25 @@ export class Bucket {
         } catch (error: any) {
             console.error('Error:', error?.response?.data?.error);
             return null;
+        }
+    }
+
+
+    /**
+      * Create new directory
+      * @param dir Directory path
+      * @returns boolean
+      */
+    async makeDir(dir: String): Promise<boolean> {
+        try {
+            // API call by axios
+            const { data } = await this.ApiManager.post('/client/file/make-dir', { dir });
+
+            // return dirData. list of dir & files
+            return true
+        } catch (error: any) {
+            console.error('Error:', error?.response?.data?.error);
+            return false;
         }
     }
 }
