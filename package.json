@@ -1,6 +1,6 @@
 {
   "name": "s3b",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A Self Hosted S3 Bucket",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -33,7 +33,7 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
-    "axios": "^1.7.2",
+    "axios": "^1.7.3",
     "form-data": "^4.0.0",
     "tsup": "^8.1.0"
   }
