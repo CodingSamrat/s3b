@@ -15,6 +15,7 @@ function getApiManager({ bucketId, apiKey, apiSecret, baseURL }) {
 
 // src/bucket.ts
 import FormData from "form-data";
+import fs from "fs";
 var Bucket = class {
   ApiManager;
   constructor(data) {
@@ -28,41 +29,51 @@ var Bucket = class {
   /**
    * Upload file to cloud storage
    * @param filePath Full path of file
-   * @param readStream  File ReadSteam. use `fs.createReadStream(file.path)`
+   * @param file  File got from multer
    * @returns downloadUrl or null 
    */
-  async uploadFile(filePath, readStream) {
+  async uploadFile(filePath, file, options) {
     try {
+      const readStream = await fs.createReadStream(file.path);
       const formData = new FormData();
       formData.append("filePath", filePath);
       formData.append("file", readStream);
       const { data } = await this.ApiManager.post("/client/file/upload", formData);
-      console.log(data);
+      if (data?.downloadURL && options.cleanup) {
+        fs.unlinkSync(file.path);
+      }
       return data?.downloadURL;
     } catch (error) {
       console.log(error?.message);
       return null;
     }
   }
-  // =================================================================================
-  // Name         : uploadMultipleFile
-  // Description  : <{This feature is currently unavailable}>
-  // Author       : Sam (Coding Samrat)
-  // Params       : dir: string, files: File[]
-  // Return       : [downloadUrl:string] | null
-  // =================================================================================
-  async #uploadMultipleFile(dir, files) {
+  /**
+   * Upload Multiple files. By default you can upload 20 files at a time.
+   * Manage `MAX_FILES_LENGTH` of `.../s3b-server/s3b.config.js`
+   * @param dirPath Destination directory (relative to bucket dir)
+   * @param files Files array got from multer
+   * @returns 
+   */
+  async uploadManyFile(dirPath, files, options) {
     try {
       const formData = new FormData();
-      formData.append("dir", dir);
+      formData.append("dirPath", dirPath);
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        formData.append("file", file);
+        const fileStream = await fs.createReadStream(file.path);
+        formData.append("file", fileStream);
       }
-      console.log("FormData:", formData);
       const { data } = await this.ApiManager.post("/client/file/upload-many", formData);
-      return data.downloadURL;
+      if (data?.downloadURLs.length === files.length && options?.cleanup) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          fs.unlinkSync(file.path);
+        }
+      }
+      return data.downloadURLs;
     } catch (error) {
+      console.log(error.message);
       console.error("Error:", error?.response?.data?.error);
       return null;
     }

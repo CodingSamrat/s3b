@@ -3,6 +3,7 @@
 import { getApiManager } from "./apiManager";
 import FormData from "form-data";
 import { AxiosInstance } from "axios";
+import fs from 'fs'
 
 interface BucketData {
     bucketId: string;
@@ -26,15 +27,19 @@ export class Bucket {
 
 
 
+
     /**
      * Upload file to cloud storage
      * @param filePath Full path of file
-     * @param readStream  File ReadSteam. use `fs.createReadStream(file.path)`
+     * @param file  File got from multer
      * @returns downloadUrl or null 
      */
-    async uploadFile(filePath: string, readStream: File): Promise<string | null> {
+    async uploadFile(filePath: string, file: { path: string, filename: string }, options: { cleanup: false }): Promise<string | null> {
 
         try {
+
+            const readStream = await fs.createReadStream(file.path)
+
             // Create instance of FormData
             const formData = new FormData();
 
@@ -45,7 +50,11 @@ export class Bucket {
 
             // API call by axios
             const { data } = await this.ApiManager.post('/client/file/upload', formData);
-            console.log(data)
+
+            // cleanup
+            if (data?.downloadURL && options.cleanup) {
+                fs.unlinkSync(file.path)
+            }
 
             // return `downloadURL`
             return data?.downloadURL;
@@ -59,31 +68,40 @@ export class Bucket {
 
 
 
-    // =================================================================================
-    // Name         : uploadMultipleFile
-    // Description  : <{This feature is currently unavailable}>
-    // Author       : Sam (Coding Samrat)
-    // Params       : dir: string, files: File[]
-    // Return       : [downloadUrl:string] | null
-    // =================================================================================
-    async #uploadMultipleFile(dir: string, files: File[]): Promise<string | null> {
-        try {
-            const formData: FormData = new FormData();
-            formData.append('dir', dir);
 
+    /**
+     * Upload Multiple files. By default you can upload 20 files at a time.
+     * Manage `MAX_FILES_LENGTH` of `.../s3b-server/s3b.config.js`
+     * @param dirPath Destination directory (relative to bucket dir)
+     * @param files Files array got from multer
+     * @returns 
+     */
+    async uploadManyFile(dirPath: string, files: [{ path: string, filename: string }], options: { cleanup: false }): Promise<string | null> {
+        try {
+
+            const formData: FormData = new FormData();
+            formData.append('dirPath', dirPath);
 
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                formData.append('file', file);
+                const fileStream = await fs.createReadStream(file.path)
+                formData.append('file', fileStream);
             }
 
-            console.log('FormData:', formData)
             const { data } = await this.ApiManager.post('/client/file/upload-many', formData);
-            // console.log(data)
-            return data.downloadURL;
+
+            // cleanup
+            if (data?.downloadURLs.length === files.length && options?.cleanup) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+
+                    fs.unlinkSync(file.path)
+                }
+            }
+            return data.downloadURLs;
         } catch (error: any) {
-            // console.log(error)
+            console.log(error.message)
             console.error('Error:', error?.response?.data?.error);
             return null;
         }

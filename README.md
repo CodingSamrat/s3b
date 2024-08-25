@@ -2,12 +2,13 @@
 **s3b** is a powerful and user-friendly client designed to interact with the [s3b-server](https://github.com/codingsamrat/s3b-server), a self-hosted S3-compatible storage solution. This client facilitates seamless communication with the server, enabling efficient data storage, retrieval, and management within self-hosted S3 buckets. With an intuitive interface and robust functionality, s3b simplifies the process of handling S3 operations, making it an ideal tool for developers and organizations utilizing self-hosted S3 storage systems.
 
 
+
 ## Installation
 Install the s3b package 
 ``` bash
 npm install s3b
 ```
-#### For `s3b-server` Installation go through [this docs](https://github.com/codingsamrat/s3b). 
+### For `s3b-server` Installation go through [this docs](https://github.com/codingsamrat/s3b). 
 
 
 ## Usage
@@ -32,81 +33,28 @@ Now bucket instance can be used wherever it needed. Suppose, here we are using i
 // user.controller.js
 
 import { bucket } from '/path/to/s3b.config.js'
-import fs from 'fs'
-
-const avatar = req.file
-const file = await fs.createReadStream(avatar.path)
-const downloadUrl = await bucket.uploadFile('/user/avatar/user-1.png', file)
-```
-
-> ### For better experience you can use the bellow utility function:
-> Assuming the file (filename.png) is stored temporarily to the `public/temp` directory by `multer`. This function will do following:
-> * Create Read Stream of `public/temp/filename.png`
-> * Upload the Read Stream to the cloud by `s3b`
-> * Finally delete the `public/temp/filename.png` from local machine
-
-``` javascript
-// s3b.config.js
 
 ...
-
-async function uploadFile(filePath, file) {
-    try {
-        const _file = await fs.createReadStream(file.path)
-        const downloadUrl = await bucket.uploadFile(filePath, _file)
-
-        // unlink: delete the file from public/temp file
-        try {
-            await fs.unlinkSync(file.path)
-            return downloadUrl
-
-        } catch (error) {
-            console.log(error)
-        }
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-export {bucket, uploadFile}
+const avatar = req.file
+const downloadUrl = await bucket.uploadFile('/user/avatar/user-1.png', avatar)
+...
 ```
+
 
 
 
 ## Other Bucket Methods
 
-``` javascript
-// Upload single image
-// Params  : filePath, file
-// Returns : downloadUrl
-bucket.uploadFile(filePath, file)
-
-// Delete file from bucket
-// Params  : downloadUrl
-// Returns : boolean
-bucket.deleteFile(downloadUrl)
-
-// Check if file exist or not
-// Params  : downloadUrl
-// Returns : boolean
-bucket.isExist(downloadUrl)
-
-// Get info of a directory
-// Params  : dir - directory path
-// Returns : [{path, isFile, name},]
-bucket.readDir(dir)
-
-// Copy file
-// Params  : source, destination 
-// Returns : boolean
-bucket.Copy(source, destination) // relative path from bucket
-
-// Move file
-// Params  : source, destination
-// Returns : boolean
-bucket.Move(source, destination) // relative path from bucket
-```
-
+| Method         | Params                  | Description |
+| -------------- | ----------------------- | ---------------------------------------- |
+| uploadFile     | `filePath`, `file`      | `filePath` is the final destination of file on the server with file name (`path/to/file/avt-user-9877.png`). And the `file` is the file object got from [multer](https://github.com/expressjs/multer#readme).|
+| uploadManyFile | `dirPath`, `files`      | `dirPath` is the target dir on server. `files` are file objects same as `uploadFile`. |
+| deleteFile     | `downloadUrl`           | URL of the target file |
+| isExist        | `downloadUrl`           | URL of the target file |
+| Copy           | `source`, `destination` | Both path are relative path from bucket |
+| Move           | `source`, `destination` | Both path are relative path from bucket |
+| readDir        | `dir`                   | Target directory path to list all files & dirs. |
+| makeDir        | `dir`                   | Create new directory recursively |
 
 
 

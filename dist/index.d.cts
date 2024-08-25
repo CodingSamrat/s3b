@@ -5,16 +5,33 @@ interface BucketData {
     baseURL: string;
 }
 declare class Bucket {
-    #private;
     private ApiManager;
     constructor(data: BucketData);
     /**
      * Upload file to cloud storage
      * @param filePath Full path of file
-     * @param readStream  File ReadSteam. use `fs.createReadStream(file.path)`
+     * @param file  File got from multer
      * @returns downloadUrl or null
      */
-    uploadFile(filePath: string, readStream: File): Promise<string | null>;
+    uploadFile(filePath: string, file: {
+        path: string;
+        filename: string;
+    }, options: {
+        cleanup: false;
+    }): Promise<string | null>;
+    /**
+     * Upload Multiple files. By default you can upload 20 files at a time.
+     * Manage `MAX_FILES_LENGTH` of `.../s3b-server/s3b.config.js`
+     * @param dirPath Destination directory (relative to bucket dir)
+     * @param files Files array got from multer
+     * @returns
+     */
+    uploadManyFile(dirPath: string, files: [{
+        path: string;
+        filename: string;
+    }], options: {
+        cleanup: false;
+    }): Promise<string | null>;
     /**
      * Delete file from S3 Bucket
      * @param downloadUrl Download URL of file
